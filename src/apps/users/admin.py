@@ -1,29 +1,34 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import User
+from django.utils.translation import gettext_lazy as _
 
+from apps.users.models import (
+    User,
+)
 
-@admin.register(User)
-class CustomUserAdmin(UserAdmin):
-
-
-    model = User
-    list_display = ("email", "phone", "is_seller", "is_staff", "date_joined")
-    search_fields = ("email", "phone")
-    ordering = ("-date_joined",)
-
+class StaffAdmin(UserAdmin):
     fieldsets = (
         (None, {"fields": ("email", "password")}),
-        ("Личная информация", {"fields": ("phone",)}),
-        ("Разрешения", {"fields": ("is_active", "is_staff", "is_superuser", "is_seller")}),
-        ("Даты", {"fields": ("date_joined",)}),
+        (_("Personal info"), {"fields": ("first_name", "last_name")}),
+        (_("Permissions"), {
+            "fields": ("is_active", "is_staff", "is_superuser", "groups", "user_permissions", "role"),
+            },
+         ),
+        (_("Important dates"), {"fields": ("last_login", "date_joined")}),
     )
 
     add_fieldsets = (
-        (None, {
-            "classes": ("wide",),
-            "fields": ("email", "password1", "password2", "phone", "is_seller", "is_staff"),
-        }),
+        (
+            None,
+            {
+                "classes": ("wide",),
+                "fields": ("email", "password1", "password2"),
+            },
+        ),
     )
 
-    filter_horizontal = ()
+    list_display = ("email", "first_name", "last_name", "is_staff")
+    search_fields = ("first_name", "last_name", "email")
+    ordering = ("email",)
+
+admin.site.register(User, StaffAdmin)
