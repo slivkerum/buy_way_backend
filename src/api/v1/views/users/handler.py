@@ -6,9 +6,8 @@ from rest_framework import status
 
 from apps.users.entities.users import UserEntity
 from apps.users.repositories.users import UserRepository
-from apps.users.serializers.users import (
-    UserCreateSerializer,
-    UserResponseSerializer
+from api.v1.serializers.users import (
+    UserSerializer
 )
 from apps.users.services.users import UserService
 
@@ -17,7 +16,7 @@ class CreateUserAPIView(APIView):
 
     @staticmethod
     def post(request) -> Response:
-        serializer = UserCreateSerializer(data=request.data)
+        serializer = UserSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -27,7 +26,6 @@ class CreateUserAPIView(APIView):
             first_name=serializer.validated_data['first_name'],
             last_name=serializer.validated_data['last_name'],
             role=serializer.validated_data['role'],
-            password=serializer.data['password'],
         )
 
         user_service = UserService(UserRepository())
@@ -37,5 +35,4 @@ class CreateUserAPIView(APIView):
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        response_serializer = UserResponseSerializer(user)
-        return Response(response_serializer.data, status=status.HTTP_201_CREATED)
+        return Response(status=status.HTTP_201_CREATED)

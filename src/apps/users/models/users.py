@@ -45,6 +45,7 @@ class User(AbstractUser):
         verbose_name=_('Роль'),
         choices=[(role.value, role.value) for role in UserRole]
     )
+    enters_count = models.BigIntegerField(default=0, verbose_name=_('Количество входов'))
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
@@ -60,7 +61,9 @@ class User(AbstractUser):
             last_name=self.last_name,
             password=self.password,
             email=self.email,
+            is_active=self.is_active,
             role=self.role,
+            enters_count=self.enters_count,
         )
 
     class Meta:

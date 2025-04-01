@@ -19,7 +19,10 @@ class UserEntity:
     email: str
     password: str
 
+    is_active: bool
+
     role: UserRole
+    enters_count: int
 
     @property
     def full_name(self):

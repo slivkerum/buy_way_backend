@@ -1,6 +1,6 @@
-from django.urls import path
-from .users.handler import CreateUserAPIView
+from django.urls import path, include
 
 urlpatterns = [
-    path('users/', CreateUserAPIView.as_view(), name='user-create'),
+    path('users/', include('api.v1.views.users.urls')),
+    path('', include('api.v1.views.token.urls')),
 ]

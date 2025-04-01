@@ -21,6 +21,10 @@ class BaseUserService(ABC):
     def compare_password(self, given_password: str, user_password: str) -> bool:...
 
     @abstractmethod
+    def update_user(self, user: UserEntity) -> UserEntity:
+        ...
+
+    @abstractmethod
     def create_user(self, user: UserEntity) -> None:...
 
 
@@ -36,6 +40,9 @@ class UserService(BaseUserService):
 
     def compare_password(self, given_password: str, user_password: str) -> bool:
         return self.user_repository.compare_password(given_password=given_password, user_password=user_password)
+
+    def update_user(self, user: UserEntity) -> UserEntity:
+        return self.user_repository.update_user(user)
 
     def create_user(self, user: UserEntity) -> None:
         self.user_repository.create_user(user)

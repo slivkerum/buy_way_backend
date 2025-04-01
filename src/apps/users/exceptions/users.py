@@ -20,3 +20,20 @@ class UserEmailNotFound(ServiceException):
     @property
     def message(self):
         return f"Пользователь с таки email: {self.email} не найден"
+
+
+@dataclass(eq=False)
+class UserNotActiveException(ServiceException):
+
+    @property
+    def message(self):
+        return 'Пользователь неактивен'
+
+
+@dataclass(eq=False)
+class UserInvalidCredentialsException(ServiceException):
+
+    @property
+    def message(self):
+        return 'Неверный логин или пароль'
+

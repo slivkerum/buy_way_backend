@@ -28,6 +28,10 @@ class BaseUserRepository(ABC):
     def compare_password(self, given_password: str, user_password: str) -> bool:...
 
     @abstractmethod
+    def update_user(self, user: UserEntity) -> UserEntity:
+        ...
+
+    @abstractmethod
     def create_user(self, user: UserEntity) -> None:...
 
 
@@ -48,8 +52,13 @@ class UserRepository(BaseUserRepository):
     def compare_password(self, given_password: str, user_password: str) -> bool:
         return check_password(given_password, user_password)
 
+    def update_user(self, user: UserEntity) -> UserEntity:
+        User.objects.filter(id=user.id).update(enters_count=user.enters_count)
+        return self.get_user_by_id(user.id)
+
     def create_user(self, user: UserEntity) -> None:
         User.objects.create_user(
+            id=user.id,
             first_name=user.first_name,
             last_name=user.last_name,
 
