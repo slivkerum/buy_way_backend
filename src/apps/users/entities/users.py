@@ -7,7 +7,7 @@ class UserRole(str, Enum):
     ADMIN = 'Администратор'
     CUSTOMER = 'Покупатель'
     SELLER = 'Продавец'
-    SUPPORT = 'Тех .поддержка'
+    SUPPORT = 'Тех.поддержка'
 
 
 @dataclass

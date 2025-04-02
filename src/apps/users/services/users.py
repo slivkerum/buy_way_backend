@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from uuid import UUID
 
 from apps.users.entities.users import UserEntity
+from apps.users.exceptions.users import UserIdNotFound
 from apps.users.repositories.users import BaseUserRepository
 
 
@@ -27,6 +28,9 @@ class BaseUserService(ABC):
     @abstractmethod
     def create_user(self, user: UserEntity) -> None:...
 
+    @abstractmethod
+    def soft_delete_user(self, user_id: UUID) -> bool:...
+
 
 @dataclass
 class UserService(BaseUserService):
@@ -46,4 +50,13 @@ class UserService(BaseUserService):
 
     def create_user(self, user: UserEntity) -> None:
         self.user_repository.create_user(user)
+
+    def soft_delete_user(self, user_id: UUID) -> bool:
+        try:
+            user = self.user_repository.get_user_by_id(user_id)
+        except UserIdNotFound:
+            return False
+
+        self.user_repository.soft_delete_user(user)
+        return True
 

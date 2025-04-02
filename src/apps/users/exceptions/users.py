@@ -37,3 +37,11 @@ class UserInvalidCredentialsException(ServiceException):
     def message(self):
         return 'Неверный логин или пароль'
 
+
+@dataclass(eq=False)
+class UserEmailAlreadyExistsException(ServiceException):
+
+    @property
+    def message(self):
+        return 'Пользователь с таким email уже существует'
+

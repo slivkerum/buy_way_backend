@@ -1,4 +1,5 @@
 import uuid
+from datetime import timezone
 
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
@@ -46,6 +47,9 @@ class User(AbstractUser):
         choices=[(role.value, role.value) for role in UserRole]
     )
     enters_count = models.BigIntegerField(default=0, verbose_name=_('Количество входов'))
+
+    is_deleted = models.BooleanField(default=False, verbose_name=_('Удален'))
+    deleted_at = models.DateTimeField(null=True, blank=True, verbose_name=_('Дата удаления'))
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
