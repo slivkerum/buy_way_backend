@@ -1,53 +1,38 @@
 import uuid
-
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-
-class Characteristic(models.Model):
-    id = models.AutoField(primary_key=True)
-    title = models.CharField(max_length=255, verbose_name=_("Название характеристики"))
-
-    class Meta:
-        verbose_name = _("Характеристика")
-        verbose_name_plural = _("Характеристики")
-
-    def __str__(self):
-        return self.title
-
-
-class CharacteristicOption(models.Model):
-    id = models.AutoField(primary_key=True)
-    title = models.CharField(max_length=256, verbose_name=_('Значение характеристики'))
-    characteristic = models.ForeignKey(
-        Characteristic,
-        on_delete=models.CASCADE,
-        related_name='options',
-        verbose_name=_('Характеристика')
-    )
-
-    class Meta:
-        verbose_name = _("Опция характеристики")
-        verbose_name_plural = _("Опции характеристик")
-
-    def __str__(self):
-        return f'{self.characteristic.title}: {self.title}'
+from apps.products.entities.products import ProductEntity
+from apps.products.entities.characteristics import CharacteristicOptionEntity
 
 
 class Product(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     title = models.CharField(max_length=256, verbose_name=_("Название товара"))
     amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name=_("Цена"))
+    seller_id = models.CharField(max_length=255, verbose_name=_("ID продавца"))
     description = models.TextField(verbose_name=_("Описание"))
-    characteristic = models.ManyToManyField(
-        CharacteristicOption,
-        related_name='products',
-        verbose_name=_("Выбранные характеристики"),
-    )
+    category = models.ForeignKey('Category', on_delete=models.CASCADE, related_name='products', verbose_name=_("Категория"))
+    product_characteristics = models.ManyToManyField('CharacteristicOption', related_name='products', verbose_name=_("Выбранные характеристики"))
+
+    def to_entity(self) -> ProductEntity:
+        product_characteristics = [
+            CharacteristicOptionEntity(id=option.id, title=option.title)
+            for option in self.product_characteristics.all()
+        ]
+        category = self.category.to_entity() if self.category else None
+        return ProductEntity(
+            id=str(self.id),
+            title=self.title,
+            amount=float(self.amount),
+            description=self.description,
+            category=category,
+            product_characteristic=product_characteristics
+        )
+
+    def __str__(self):
+        return self.title
 
     class Meta:
         verbose_name = _("Товар")
         verbose_name_plural = _("Товары")
-
-    def __str__(self):
-        return self.title

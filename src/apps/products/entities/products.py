@@ -1,30 +1,18 @@
-from uuid import UUID
+from typing import List
 from dataclasses import dataclass
-
-
-@dataclass
-class CharacteristicOptionEntity:
-    id: int
-    title: str
-
-
-@dataclass
-class CharacteristicEntity:
-    id: int
-    title: str
-    options: list[CharacteristicOptionEntity]
-
-
-@dataclass
-class ProductCharacteristicEntity:
-    characteristic: CharacteristicEntity
-    selected_option: CharacteristicOptionEntity
+from .categories import CategoryEntity
+from .characteristics import CharacteristicOptionEntity
 
 
 @dataclass
 class ProductEntity:
-    id: UUID
+    id: str
     title: str
     amount: float
     description: str
-    product_characteristic: list[ProductCharacteristicEntity]
+    category: CategoryEntity
+    product_characteristic: List[CharacteristicOptionEntity]
+
+    @property
+    def characteristic_titles(self):
+        return [char_option.title for char_option in self.product_characteristic]
