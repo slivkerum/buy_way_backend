@@ -10,6 +10,9 @@ from apps.users.services.users import (
     BaseUserService,
     UserService,
 )
+from apps.users.use_cases.register_user import (
+    RegisterUserUseCase,
+)
 
 
 @lru_cache(1)
@@ -23,6 +26,8 @@ def _initialize_container() -> punq.Container:
     container.register(BaseUserRepository, UserRepository)
 
     container.register(BaseUserService, UserService)
+
+    container.register(RegisterUserUseCase)
 
     return container
 

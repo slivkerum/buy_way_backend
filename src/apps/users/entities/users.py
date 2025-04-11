@@ -16,13 +16,15 @@ class UserEntity:
     first_name: str
     last_name: str
 
+    phone: str
+
     email: str
     password: str
 
-    is_active: bool
-
     role: UserRole
-    enters_count: int
+
+    is_active: bool = False
+    enters_count: int = 0
 
     @property
     def full_name(self):

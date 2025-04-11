@@ -40,6 +40,14 @@ class User(AbstractUser):
     last_name = models.CharField(max_length=256, verbose_name=_('Фамилия'))
 
     email = models.EmailField(unique=True, verbose_name=_('Email'))
+
+    phone = models.CharField(
+        max_length=32,
+        null=True,
+        blank=True,
+        verbose_name=_('Телефон')
+    )
+
     role = models.CharField(
         max_length=256,
         verbose_name=_('Роль'),
@@ -62,6 +70,7 @@ class User(AbstractUser):
             id=self.id,
             first_name=self.first_name,
             last_name=self.last_name,
+            phone=self.phone,
             password=self.password,
             email=self.email,
             is_active=self.is_active,
