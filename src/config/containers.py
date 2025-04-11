@@ -14,6 +14,10 @@ from apps.products.repositories.products import (
     BaseProductRepository,
     ProductRepository,
 )
+from apps.products.repositories.reviews import (
+    BaseReviewRepository,
+    ReviewRepository,
+)
 from apps.products.services.categories import (
     BaseCategoryService,
     CategoryService,
@@ -25,6 +29,10 @@ from apps.products.services.characteristics import (
 from apps.products.services.products import (
     BaseProductService,
     ProductService,
+)
+from apps.products.services.reviews import (
+    BaseReviewService,
+    ReviewService,
 )
 from apps.users.repositories.users import (
     BaseUserRepository,
@@ -51,11 +59,13 @@ def _initialize_container() -> punq.Container:
     container.register(BaseProductRepository, ProductRepository)
     container.register(BaseCategoryRepository, CategoryRepository)
     container.register(BaseCharacteristicRepository, CharacteristicRepository)
+    container.register(BaseReviewRepository, ReviewRepository)
 
     container.register(BaseUserService, UserService)
     container.register(BaseProductService, ProductService)
     container.register(BaseCategoryService, CategoryService)
     container.register(BaseCharacteristicService, CharacteristicService)
+    container.register(BaseReviewService, ReviewService)
 
     container.register(RegisterUserUseCase)
 

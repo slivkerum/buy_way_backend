@@ -8,3 +8,6 @@ from .characteristics import (
     Characteristic,
     CharacteristicOption
 )
+from .reviews import (
+    Review
+)

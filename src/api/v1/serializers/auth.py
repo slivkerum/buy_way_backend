@@ -10,7 +10,7 @@ class RegisterSerializer(serializers.Serializer):
     register_user: RegisterUserUseCase = container.resolve(RegisterUserUseCase)
 
     email = serializers.EmailField(required=True)
-    password = serializers.CharField(write_only=True)
+    password = serializers.CharField(write_only=True, required=True)
     first_name = serializers.CharField(required=False)
     last_name = serializers.CharField(required=False)
     phone = serializers.CharField(required=True)
