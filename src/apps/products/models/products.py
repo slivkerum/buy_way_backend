@@ -22,7 +22,7 @@ class Product(models.Model):
         ]
         category = self.category.to_entity() if self.category else None
         return ProductEntity(
-            id=str(self.id),
+            id=self.id,
             title=self.title,
             amount=float(self.amount),
             description=self.description,

@@ -1,0 +1,36 @@
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status, permissions
+
+from apps.products.services.categories import BaseCategoryService
+from config.containers import get_container
+from api.v1.serializers.categories import CategorySerializer
+
+
+class CategoryListView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    @staticmethod
+    def get(request):
+        container = get_container()
+        service: BaseCategoryService = container.resolve(BaseCategoryService)
+
+        categories = service.get_all_categories()
+        data = [CategorySerializer.from_entity(c) for c in categories]
+        return Response(data, status=status.HTTP_200_OK)
+
+
+class CategoryDetailView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    @staticmethod
+    def get(request, category_id: int):
+        container = get_container()
+        service: BaseCategoryService = container.resolve(BaseCategoryService)
+
+        try:
+            category = service.get_category_by_id(category_id)
+            data = CategorySerializer.from_entity(category)
+            return Response(data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"detail": str(e)}, status=status.HTTP_404_NOT_FOUND)

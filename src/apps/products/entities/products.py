@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from typing import List
 from dataclasses import dataclass
 from .categories import CategoryEntity
@@ -6,7 +8,7 @@ from .characteristics import CharacteristicOptionEntity
 
 @dataclass
 class ProductEntity:
-    id: str
+    id: UUID
     title: str
     amount: float
     description: str
