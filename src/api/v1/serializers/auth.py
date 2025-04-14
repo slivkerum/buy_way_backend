@@ -16,6 +16,9 @@ class RegisterSerializer(serializers.Serializer):
     phone = serializers.CharField(required=True)
     role = serializers.ChoiceField(choices=[(role.name, role.value) for role in UserRole], required=True)
 
+    organization_name = serializers.CharField(required=False)
+    organization_documents = serializers.FileField(required=False)
+
     @staticmethod
     def validate_role(value):
         try:
@@ -23,5 +26,13 @@ class RegisterSerializer(serializers.Serializer):
         except KeyError:
             raise serializers.ValidationError("Некорректная роль пользователя")
 
+    def validate(self, data):
+        request = self.context.get("request")
+        if data["role"] == "SELLER" or data["role"] == UserRole.SELLER.name:
+            if not data.get("organization_name") or not request.FILES.get("organization_documents"):
+                raise serializers.ValidationError("Продавец должен указать организацию и загрузить документы.")
+        return data
+
     def create(self, validated_data):
-        return self.register_user.execute(validated_data)
+        request = self.context.get("request")
+        return self.register_user.execute(validated_data, request.FILES)

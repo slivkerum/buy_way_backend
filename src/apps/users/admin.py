@@ -4,6 +4,7 @@ from django.utils.translation import gettext_lazy as _
 
 from apps.users.models import (
     User,
+    Organization
 )
 
 class StaffAdmin(UserAdmin):
@@ -31,4 +32,26 @@ class StaffAdmin(UserAdmin):
     search_fields = ("first_name", "last_name", "email")
     ordering = ("email",)
 
+
+class OrganizationAdmin(admin.ModelAdmin):
+    fieldsets = (
+        (None, {
+            "fields": ("name", "owner", "documents")
+        }),
+        (_("Статус"), {
+            "fields": ("is_active",)
+        }),
+        (_("Временные метки"), {
+            "fields": ("created_at",)
+        }),
+    )
+
+    readonly_fields = ("created_at",)
+    list_display = ("id", "name", "owner", "is_active", "created_at")
+    search_fields = ("name", "owner__email")
+    ordering = ("-created_at",)
+    list_filter = ("is_active", "created_at")
+
+
+admin.site.register(Organization, OrganizationAdmin)
 admin.site.register(User, StaffAdmin)

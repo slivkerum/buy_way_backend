@@ -9,8 +9,10 @@ from api.v1.serializers.auth import RegisterSerializer
 
 class RegisterUserView(generics.CreateAPIView):
     permission_classes = [AllowAny]
-
     serializer_class = RegisterSerializer
+
+    def get_serializer_context(self):
+        return {"request": self.request}
 
 
 class LogoutView(APIView):

@@ -42,7 +42,6 @@ class User(AbstractUser):
     email = models.EmailField(unique=True, verbose_name=_('Email'))
 
     phone = models.CharField(
-        default='123',
         max_length=32,
         verbose_name=_('Телефон')
     )
