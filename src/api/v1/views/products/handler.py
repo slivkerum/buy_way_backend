@@ -9,7 +9,7 @@ from api.v1.serializers.products import ProductSerializer
 
 
 class ProductListCreateView(APIView):
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
 
     @staticmethod
     def get(request):
@@ -36,7 +36,7 @@ class ProductListCreateView(APIView):
 
 
 class ProductDetailView(APIView):
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
 
     @staticmethod
     def get(request, product_id: UUID):

@@ -8,7 +8,7 @@ from api.v1.serializers.characteristics import CharacteristicSerializer
 
 
 class CharacteristicListView(APIView):
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
 
     @staticmethod
     def get(request):
@@ -21,7 +21,7 @@ class CharacteristicListView(APIView):
 
 
 class CharacteristicDetailView(APIView):
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
 
     @staticmethod
     def get(request, char_id: int):

@@ -9,7 +9,7 @@ from api.v1.serializers.reviews import ReviewSerializer
 
 
 class ReviewListCreateView(APIView):
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, product_id: UUID):
         container = get_container()
@@ -33,7 +33,7 @@ class ReviewListCreateView(APIView):
 
 
 class ReviewDeleteView(APIView):
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
 
     def delete(self, request, review_id: int):
         container = get_container()
@@ -44,7 +44,7 @@ class ReviewDeleteView(APIView):
 
 
 class ReviewDetailView(APIView):
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, review_id: int):
         container = get_container()

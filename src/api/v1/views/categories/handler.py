@@ -8,7 +8,7 @@ from api.v1.serializers.categories import CategorySerializer
 
 
 class CategoryListView(APIView):
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
 
     @staticmethod
     def get(request):
@@ -21,7 +21,7 @@ class CategoryListView(APIView):
 
 
 class CategoryDetailView(APIView):
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
 
     @staticmethod
     def get(request, category_id: int):
