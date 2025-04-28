@@ -7,5 +7,6 @@ urlpatterns = [
     path('auth/', include('api.v1.views.auth.urls')),
     path('categories/', include('api.v1.views.categories.urls')),
     path('characteristics/', include('api.v1.views.characteristics.urls')),
+    path('cart/', include('api.v1.views.cart.urls')),
     path('', include('api.v1.views.token.urls')),
 ]

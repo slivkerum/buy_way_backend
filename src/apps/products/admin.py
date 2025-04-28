@@ -1,14 +1,16 @@
 from django.contrib import admin
+
+from apps.products.models import Cart, CartProduct
 from apps.products.models.categories import Category
 from apps.products.models.products import Product
 from apps.products.models.characteristics import Characteristic, CharacteristicOption
 
 
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title', 'parent_category')  # Исправил 'main_category' на 'parent_category'
+    list_display = ('id', 'title', 'parent_category')
     search_fields = ('title',)
     filter_horizontal = ('characteristics',)
-    list_filter = ('parent_category',)  # Исправил 'main_category' на 'parent_category'
+    list_filter = ('parent_category',)
     ordering = ('title',)
 
 
@@ -28,14 +30,30 @@ class CharacteristicOptionAdmin(admin.ModelAdmin):
 
 
 class CharacteristicAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title')  # Убрал 'category', так как поля с таким именем нет
+    list_display = ('id', 'title')
     search_fields = ('title',)
-    list_filter = ()  # Убрал 'category', так как у характеристики нет связи с категорией
+    list_filter = ()
     ordering = ('title',)
 
 
-# Регистрация моделей в админке
+class CartAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user_id', 'created_at')
+    search_fields = ('user_id',)
+    readonly_fields = ('created_at',)
+    list_filter = ('created_at',)
+
+
+class CartProductAdmin(admin.ModelAdmin):
+    list_display = ('id', 'cart', 'product_id', 'quantity')
+    search_fields = ('product_id', 'cart__user_id')
+    readonly_fields = ()
+    list_filter = ()
+
+
+
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Product, ProductAdmin)
 admin.site.register(Characteristic, CharacteristicAdmin)
 admin.site.register(CharacteristicOption, CharacteristicOptionAdmin)
+admin.site.register(Cart, CartAdmin)
+admin.site.register(CartProduct, CartProductAdmin)

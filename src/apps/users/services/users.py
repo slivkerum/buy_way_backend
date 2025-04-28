@@ -8,6 +8,7 @@ from uuid import UUID
 from apps.users.entities.users import UserEntity
 from apps.users.exceptions.users import UserIdNotFound
 from apps.users.repositories.users import BaseUserRepository
+from apps.users.use_cases.users.create_cart import CreateCartUseCases
 
 
 class BaseUserService(ABC):
@@ -35,6 +36,7 @@ class BaseUserService(ABC):
 @dataclass
 class UserService(BaseUserService):
     user_repository: BaseUserRepository
+    cart_use_cases: CreateCartUseCases
 
     def get_user_by_id(self, user_id: UUID) -> UserEntity:
         return self.user_repository.get_user_by_id(user_id)
@@ -50,6 +52,7 @@ class UserService(BaseUserService):
 
     def create_user(self, user: UserEntity) -> None:
         self.user_repository.create_user(user)
+        self.cart_use_cases.create(user.id)
 
     def soft_delete_user(self, user_id: UUID) -> bool:
         try:

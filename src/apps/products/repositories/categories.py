@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from typing import List
 from apps.products.models.categories import Category
 from apps.products.entities.categories import CategoryEntity
 from apps.products.exceptions.categories import CategoryNotFound
@@ -8,7 +7,7 @@ from apps.products.exceptions.categories import CategoryNotFound
 class BaseCategoryRepository(ABC):
 
     @abstractmethod
-    def get_all(self) -> List[CategoryEntity]: ...
+    def get_all(self) -> list[CategoryEntity]: ...
 
     @abstractmethod
     def get_by_id(self, category_id: int) -> CategoryEntity: ...
@@ -16,7 +15,7 @@ class BaseCategoryRepository(ABC):
 
 class CategoryRepository(BaseCategoryRepository):
 
-    def get_all(self) -> List[CategoryEntity]:
+    def get_all(self) -> list[CategoryEntity]:
         return [cat.to_entity() for cat in Category.objects.all()]
 
     def get_by_id(self, category_id: int) -> CategoryEntity:

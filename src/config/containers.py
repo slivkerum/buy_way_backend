@@ -2,6 +2,10 @@ from functools import lru_cache
 
 import punq
 
+from apps.products.repositories.cart import (
+    BaseCartRepository,
+    CartRepository,
+)
 from apps.products.repositories.categories import (
     BaseCategoryRepository,
     CategoryRepository,
@@ -17,6 +21,10 @@ from apps.products.repositories.products import (
 from apps.products.repositories.reviews import (
     BaseReviewRepository,
     ReviewRepository,
+)
+from apps.products.services.cart import (
+    BaseCartService,
+    CartService,
 )
 from apps.products.services.categories import (
     BaseCategoryService,
@@ -34,18 +42,27 @@ from apps.products.services.reviews import (
     BaseReviewService,
     ReviewService,
 )
-from apps.users.repositories.organizations import BaseOrganizationRepository, OrganizationRepository
+from apps.users.repositories.organizations import (
+    BaseOrganizationRepository,
+    OrganizationRepository,
+)
 from apps.users.repositories.users import (
     BaseUserRepository,
     UserRepository,
 )
-from apps.users.services.organizations import BaseOrganizationService, OrganizationService
+from apps.users.services.organizations import (
+    BaseOrganizationService,
+    OrganizationService,
+)
 from apps.users.services.users import (
     BaseUserService,
     UserService,
 )
-from apps.users.use_cases.register_user import (
+from apps.users.use_cases.users.register_user import (
     RegisterUserUseCase,
+)
+from apps.users.use_cases.users.create_cart import (
+    CreateCartUseCases
 )
 
 
@@ -63,6 +80,7 @@ def _initialize_container() -> punq.Container:
     container.register(BaseCharacteristicRepository, CharacteristicRepository)
     container.register(BaseReviewRepository, ReviewRepository)
     container.register(BaseOrganizationRepository, OrganizationRepository)
+    container.register(BaseCartRepository, CartRepository)
 
     container.register(BaseUserService, UserService)
     container.register(BaseProductService, ProductService)
@@ -70,7 +88,9 @@ def _initialize_container() -> punq.Container:
     container.register(BaseCharacteristicService, CharacteristicService)
     container.register(BaseReviewService, ReviewService)
     container.register(BaseOrganizationService, OrganizationService)
+    container.register(BaseCartService, CartService)
 
+    container.register(CreateCartUseCases)
     container.register(RegisterUserUseCase)
 
     return container

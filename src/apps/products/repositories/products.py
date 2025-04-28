@@ -1,4 +1,3 @@
-from itertools import product
 from uuid import UUID
 from abc import ABC, abstractmethod
 

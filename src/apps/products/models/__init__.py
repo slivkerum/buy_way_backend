@@ -11,3 +11,7 @@ from .characteristics import (
 from .reviews import (
     Review
 )
+from .cart import (
+    Cart,
+    CartProduct,
+)
