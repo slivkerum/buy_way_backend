@@ -9,5 +9,5 @@ class OrganizationEntity:
     name: str
     owner_id: UUID
     created_at: datetime
-    documents_path: str
+    documents_path: list[str]
     is_active: bool

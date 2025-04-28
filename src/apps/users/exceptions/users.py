@@ -43,5 +43,5 @@ class UserEmailAlreadyExistsException(ServiceException):
 
     @property
     def message(self):
-        return 'Пользователь с таким email уже существует'
+        return f'Пользователь с таким email уже существует'
 
