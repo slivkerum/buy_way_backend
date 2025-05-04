@@ -4,3 +4,7 @@ from .users import (
 from .organizations import (
     Organization
 )
+
+from .email_confirmation import (
+    EmailConfirmationCode
+)
