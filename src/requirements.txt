@@ -21,12 +21,14 @@ django-redis==5.4.0
 djangorestframework==3.15.2
 djangorestframework_simplejwt==5.5.0
 djoser==2.3.1
+drf-yasg==1.21.10
 ecdsa==0.19.0
 fastapi==0.115.11
 greenlet==3.1.1
 gunicorn==23.0.0
 h11==0.14.0
 idna==3.10
+inflection==0.5.1
 kombu==5.4.2
 oauthlib==3.2.2
 packaging==24.2
@@ -43,6 +45,8 @@ python-dateutil==2.9.0.post0
 python-dotenv==1.0.1
 python-jose==3.4.0
 python3-openid==3.2.0
+pytz==2025.2
+PyYAML==6.0.2
 redis==5.2.1
 requests==2.32.3
 requests-oauthlib==2.0.0
@@ -56,6 +60,7 @@ sqlparse==0.5.3
 starlette==0.46.1
 typing_extensions==4.12.2
 tzdata==2025.1
+uritemplate==4.1.1
 urllib3==2.4.0
 uvicorn==0.34.0
 uWSGI==2.0.29
