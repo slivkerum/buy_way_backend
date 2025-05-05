@@ -8,7 +8,7 @@ from uuid import UUID
 from apps.users.entities.users import UserEntity
 from apps.users.exceptions.users import UserIdNotFound
 from apps.users.repositories.users import BaseUserRepository
-from apps.users.use_cases.users.create_cart import CreateCartUseCases
+from apps.users.use_cases.users.cart.create import CreateCartUseCases
 
 
 class BaseUserService(ABC):

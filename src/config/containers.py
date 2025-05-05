@@ -64,10 +64,10 @@ from apps.users.use_cases.users.email_confirmation.send import (
 from apps.users.use_cases.users.email_confirmation.confirm import (
     ConfirmEmailCodeUseCase
 )
-from apps.users.use_cases.users.register_user import (
+from apps.users.use_cases.users.auth.registration import (
     RegisterUserUseCase,
 )
-from apps.users.use_cases.users.create_cart import (
+from apps.users.use_cases.users.cart.create import (
     CreateCartUseCases
 )
 
