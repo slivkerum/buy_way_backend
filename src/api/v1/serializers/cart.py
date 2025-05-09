@@ -25,11 +25,13 @@ class CartSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
     user_id = serializers.UUIDField(read_only=True)
     products = CartProductSerializer(many=True, required=False)
+    total_price = serializers.DecimalField(max_digits=10, decimal_places=2)
 
     def to_entity(self) -> CartEntity:
         return CartEntity(
             id=self.validated_data.get("id"),
             user_id=self.validated_data["user_id"],
+            total_price=self.validated_data.get("total_price"),
             items=[CartProductEntity(**product) for product in self.validated_data.get("items", [])],
             created_at=self.validated_data.get("created_at")
         )
@@ -39,5 +41,6 @@ class CartSerializer(serializers.Serializer):
         return {
             "id": cart.id,
             "user_id": cart.user_id,
+            "total_price": cart.total_price,
             "items": [CartProductSerializer.from_entity(product) for product in cart.items]
         }
