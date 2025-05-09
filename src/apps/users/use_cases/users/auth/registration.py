@@ -10,12 +10,14 @@ from apps.users.exceptions.users import UserEmailAlreadyExistsException
 from apps.users.services.users import BaseUserService
 from apps.users.services.organizations import BaseOrganizationService
 from apps.users.entities.users import UserRole
+from apps.users.use_cases.users.email_confirmation.send import SendEmailConfirmationCodeUseCase
 
 
 @dataclass
 class RegisterUserUseCase:
     organization_service: BaseOrganizationService
     user_service: BaseUserService
+    email_confirmation: SendEmailConfirmationCodeUseCase
 
     def execute(self, user_data: dict, files=None) -> UserEntity:
         try:
@@ -35,6 +37,7 @@ class RegisterUserUseCase:
                 first_name=user_data.get("first_name", ""),
                 last_name=user_data.get("last_name", ""),
                 role=user_data.get("role"),
+                is_active=user_data.get("is_active"),
             )
 
             self.user_service.create_user(user_entity)
@@ -52,5 +55,8 @@ class RegisterUserUseCase:
                     organization_entity,
                     files.getlist("organization_documents")
                 )
+
+            self.user_service.update_user(user_entity)
+            self.email_confirmation.execute(user_entity.email)
 
         return user_entity

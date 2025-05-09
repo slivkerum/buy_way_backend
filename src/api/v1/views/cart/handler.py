@@ -49,7 +49,7 @@ class CartProductView(APIView):
 
         cart_id = self.get_cart_id(request)
         product_id = request.data.get("product_id")
-        quantity = request.data.get("quantity")
+        quantity = int(request.data.get("quantity"))
 
         cart_product = cart_service.add_product_to_cart(cart_id, product_id, quantity)
         serialized = CartProductSerializer.from_entity(cart_product)
@@ -61,7 +61,7 @@ class CartProductView(APIView):
 
         cart_id = self.get_cart_id(request)
         product_id = request.data.get("product_id")
-        quantity = request.data.get("quantity")
+        quantity = int(request.data.get("quantity"))
 
         cart_product = service.update_product_quantity_in_cart(cart_id, product_id, quantity)
         serialized = CartProductSerializer.from_entity(cart_product)

@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from apps.users.entities.users import UserRole
-from apps.users.use_cases.users.register_user import RegisterUserUseCase
+from apps.users.use_cases.users.auth.registration import RegisterUserUseCase
 from config.containers import get_container
 
 

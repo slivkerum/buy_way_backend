@@ -16,11 +16,18 @@ class Cart(models.Model):
         verbose_name=_('Пользователь')
     )
     created_at = models.DateTimeField(auto_now_add=True)
+    total_price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=0,
+        verbose_name=_('Цена всех товаров')
+    )
 
     def to_entity(self) -> 'CartEntity':
         return CartEntity(
             id=self.id,
             user_id=self.user_id,
+            total_price=self.total_price,
             created_at=self.created_at,
             items=[item.to_entity() for item in self.items.all()]
         )

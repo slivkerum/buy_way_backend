@@ -58,10 +58,16 @@ from apps.users.services.users import (
     BaseUserService,
     UserService,
 )
-from apps.users.use_cases.users.register_user import (
+from apps.users.use_cases.users.email_confirmation.send import (
+    SendEmailConfirmationCodeUseCase
+)
+from apps.users.use_cases.users.email_confirmation.confirm import (
+    ConfirmEmailCodeUseCase
+)
+from apps.users.use_cases.users.auth.registration import (
     RegisterUserUseCase,
 )
-from apps.users.use_cases.users.create_cart import (
+from apps.users.use_cases.users.cart.create import (
     CreateCartUseCases
 )
 
@@ -92,6 +98,8 @@ def _initialize_container() -> punq.Container:
 
     container.register(CreateCartUseCases)
     container.register(RegisterUserUseCase)
+    container.register(SendEmailConfirmationCodeUseCase)
+    container.register(ConfirmEmailCodeUseCase)
 
     return container
 

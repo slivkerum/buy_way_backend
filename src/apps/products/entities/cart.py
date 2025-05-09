@@ -14,5 +14,6 @@ class CartProductEntity:
 class CartEntity:
     id: int
     user_id: UUID
+    total_price: int
     created_at: datetime
     items: list[CartProductEntity]

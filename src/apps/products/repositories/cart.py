@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from uuid import UUID
 from dataclasses import dataclass
 
-from apps.products.models import Cart, CartProduct
+from apps.products.models import Cart, CartProduct, Product
 from apps.products.entities.cart import CartProductEntity, CartEntity
 
 class BaseCartRepository(ABC):
@@ -42,6 +42,11 @@ class BaseCartRepository(ABC):
         """Очистить корзину."""
         ...
 
+    @abstractmethod
+    def _recalculate_cart_total(self, cart: Cart) -> None:
+        """Пересчет итоговой суммы корзины"""
+        ...
+
 
 @dataclass
 class CartRepository(BaseCartRepository):
@@ -57,29 +62,52 @@ class CartRepository(BaseCartRepository):
     def add_product(self, cart_id: int, product_id: UUID, quantity: int) -> CartProductEntity:
         cart = Cart.objects.get(id=cart_id)
 
-        if product_id in cart:
-            self.update_product_quantity(cart_id, product_id, quantity)
-
-        cart_product = CartProduct.objects.create(
+        cart_product, created = CartProduct.objects.get_or_create(
             cart=cart,
             product_id=product_id,
-            quantity=quantity
+            defaults={'quantity': quantity}
         )
+
+        if not created:
+            cart_product.quantity += quantity
+            cart_product.save()
+        self._recalculate_cart_total(cart)
+
         return cart_product.to_entity()
 
     def update_product_quantity(self, cart_id: int, product_id: UUID, quantity: int) -> CartProductEntity:
         cart_product = CartProduct.objects.get(cart_id=cart_id, product_id=product_id)
         cart_product.quantity = quantity
         cart_product.save()
+        self._recalculate_cart_total(cart_product.cart)
+
         return cart_product.to_entity()
 
     def remove_product(self, cart_id: int, product_id: UUID) -> None:
         cart_product = CartProduct.objects.get(cart_id=cart_id, product_id=product_id)
+        cart = cart_product.cart
         cart_product.delete()
+        self._recalculate_cart_total(cart)
 
     def get_products_in_cart(self, cart_id: int) -> list[CartProductEntity]:
         cart_products = CartProduct.objects.filter(cart_id=cart_id)
         return [product.to_entity() for product in cart_products]
 
     def clear_cart(self, cart_id: int) -> None:
-        CartProduct.objects.filter(cart_id=cart_id).delete()
+        cart = Cart.objects.get(id=cart_id)
+        CartProduct.objects.filter(cart=cart).delete()
+        cart.total_price = 0
+        cart.save(update_fields=["total_price"])
+
+    def _recalculate_cart_total(self, cart: Cart) -> None:
+        cart_items = CartProduct.objects.filter(cart=cart).select_related('product')
+        total = 0
+
+        for item in cart_items:
+            product = item.product
+            quantity = item.quantity
+            total += product.final_price * quantity
+
+        cart.total_price = total
+        cart.save(update_fields=["total_price"])
+

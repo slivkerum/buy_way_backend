@@ -1,5 +1,6 @@
 import uuid
 from django.db import models
+from decimal import Decimal
 from django.utils.translation import gettext_lazy as _
 
 from apps.products.entities.products import ProductEntity
@@ -14,6 +15,7 @@ class Product(models.Model):
     description = models.TextField(verbose_name=_("Описание"))
     category = models.ForeignKey('Category', on_delete=models.CASCADE, related_name='products', verbose_name=_("Категория"))
     product_characteristics = models.ManyToManyField('CharacteristicOption', related_name='products', verbose_name=_("Выбранные характеристики"))
+    discount_percent = models.PositiveIntegerField(default=0, verbose_name=_("Скидка (%)"))
 
     def to_entity(self) -> ProductEntity:
         product_characteristics = [
@@ -29,6 +31,10 @@ class Product(models.Model):
             category=category,
             product_characteristic=product_characteristics
         )
+
+    @property
+    def final_price(self) -> float:
+        return float(self.amount * (Decimal('1') - Decimal(self.discount_percent) / Decimal('100')))
 
     def __str__(self):
         return self.title

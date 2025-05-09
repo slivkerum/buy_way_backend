@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  bay-way-postgres:
+    container_name: bay-way-postgres
+    image: postgres:14
+    restart: always
+    volumes:
+      - bay_way_postgres_data:/var/lib/postgresql/data
+    env_file:
+      - .test.env
+    ports:
+      - "1313:5432"
+    networks:
+      - backend
+
+  bay-way-redis:
+    image: redis:7
+    container_name: bay-way-redis
+    restart: always
+    volumes:
+      - bay_way_redis_data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - backend
+
+  bay-way-backend:
+    container_name: bay-way-backend
+    build:
+      context: ../src
+      dockerfile: Dockerfile
+    restart: always
+    command: "sh /entrypoint.sh"
+    volumes:
+      - socket:/app/sockets/
+      - static:/app/static
+    env_file:
+      - .test.env
+    networks:
+      - backend
+    depends_on:
+      - bay-way-postgres
+      - bay-way-redis
+
+  bay-way-nginx:
+    container_name: bay-way-nginx
+    restart: always
+    build:
+      context: ../nginx
+      dockerfile: Dockerfile
+    env_file:
+      - .test.env
+    volumes:
+      - socket:/files/socket
+      - static:/files/django_staticfiles:ro
+    ports:
+      - "8000:8080"
+    networks:
+      - backend
+    depends_on:
+      - bay-way-backend
+
+volumes:
+  bay_way_postgres_data:
+  bay_way_redis_data:
+  static:
+  socket:
+
+networks:
+  backend:
