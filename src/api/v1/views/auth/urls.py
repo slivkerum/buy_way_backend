@@ -7,7 +7,8 @@ from rest_framework_simplejwt.views import (
 from api.v1.views.auth.handler import (
     RegisterUserView,
     LogoutView,
-    ConfirmEmailView
+    ConfirmEmailView,
+    AuthMe,
 )
 
 urlpatterns = [
@@ -16,4 +17,5 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(), name='logout'),
     path('register/', RegisterUserView.as_view(), name='register'),
     path('confirm_email/', ConfirmEmailView.as_view(), name='confirm'),
+    path('me/', AuthMe.as_view(), name='me'),
 ]

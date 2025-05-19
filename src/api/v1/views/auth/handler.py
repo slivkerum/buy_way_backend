@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from api.v1.serializers.auth import RegisterSerializer
+from api.v1.serializers.users import UserSerializer
 from api.v1.serializers.email_confirmation import ConfirmEmailSerializer
 
 from config.containers import get_container
@@ -19,6 +20,15 @@ class RegisterUserView(generics.CreateAPIView):
 
     def get_serializer_context(self):
         return {"request": self.request}
+
+
+class AuthMe(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @staticmethod
+    def get(request):
+        serializer = UserSerializer(request.user)
+        return Response(serializer.data)
 
 
 class LogoutView(APIView):

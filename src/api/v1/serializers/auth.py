@@ -31,7 +31,7 @@ class RegisterSerializer(serializers.Serializer):
         if data["role"] == "SELLER" or data["role"] == UserRole.SELLER.name:
             if not data.get("organization_name") or not request.FILES.get("organization_documents"):
                 raise serializers.ValidationError("Продавец должен указать название "
-                                                  "организацию и загрузить документы.")
+                                                  "организации и загрузить документы.")
         return data
 
     def create(self, validated_data):
