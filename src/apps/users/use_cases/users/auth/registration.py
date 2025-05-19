@@ -20,25 +20,31 @@ class RegisterUserUseCase:
     email_confirmation: SendEmailConfirmationCodeUseCase
 
     def execute(self, user_data: dict, files=None) -> UserEntity:
+        user_entity = UserEntity(
+            id=uuid4(),
+            email=user_data["email"],
+            password=user_data["password"],
+            phone=user_data.get("phone"),
+            first_name=user_data.get("first_name", ""),
+            last_name=user_data.get("last_name", ""),
+            role=user_data.get("role"),
+            is_active=user_data.get("is_active"),
+        )
+
         try:
-            self.user_service.get_user_by_email(user_data['email'])
-            raise UserEmailAlreadyExistsException()
+            user = self.user_service.get_user_by_email(user_data['email'])
+
+            if not user.is_active:
+                self.email_confirmation.execute(user_entity.email)
+                return user_entity
+            else:
+                raise UserEmailAlreadyExistsException()
         except UserEmailAlreadyExistsException:
             raise
         except Exception:
             pass
 
         with transaction.atomic():
-            user_entity = UserEntity(
-                id=uuid4(),
-                email=user_data["email"],
-                password=user_data["password"],
-                phone=user_data.get("phone"),
-                first_name=user_data.get("first_name", ""),
-                last_name=user_data.get("last_name", ""),
-                role=user_data.get("role"),
-                is_active=user_data.get("is_active"),
-            )
 
             self.user_service.create_user(user_entity)
 
