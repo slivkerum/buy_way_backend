@@ -55,6 +55,7 @@ class User(AbstractUser):
 
     is_deleted = models.BooleanField(default=False, verbose_name=_('Удален'))
     deleted_at = models.DateTimeField(null=True, blank=True, verbose_name=_('Дата удаления'))
+    is_active = models.BooleanField(default=False, verbose_name=_('Активный аккаунт'))
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
