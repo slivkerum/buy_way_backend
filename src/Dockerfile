@@ -1,28 +1,21 @@
-# Используем официальное минимальное изображение Python
-FROM python:3.12-slim
+FROM python:3.12.7
 
-# Устанавливаем необходимые системные пакеты
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    gcc \
-    libpq-dev \
-    build-essential \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
-
-RUN python -m venv /opt/venv
-ENV PATH="/opt/venv/bin:$PATH"
+ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
-
-# Копируем requirements.txt и устанавливаем зависимости
-COPY requirements.txt .
-RUN pip install --upgrade pip && pip install -r requirements.txt
 
 WORKDIR /app
 
-# Копируем весь исходный код в контейнер
-COPY . /app/
+ADD pyproject.toml /app
 
-# Устанавливаем сокеты (если они понадобятся для работы)
+RUN pip install --upgrade pip
+RUN pip install poetry
+
+RUN poetry config virtualenvs.create false
+RUN poetry install --no-root --no-interaction --no-ansi
+
+ENV TZ=Asia/Qyzylorda
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
 COPY . /app/
 COPY entrypoint.sh /entrypoint.sh
 

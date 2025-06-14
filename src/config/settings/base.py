@@ -23,7 +23,7 @@ environ.Env.read_env(BASE_DIR / ".env")
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-6$p3vgo2pre^ia=7wfvu)+x%psb3jc)b&@4i#uf^!h4$07z=&0"
+SECRET_KEY = env('DJANGO_SECRET_KEY', default='mysecretkey')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -48,11 +48,7 @@ MY_APPS = [
 
 THIRD_PARTY_APPS = [
     'djoser',
-    'rest_framework',
-    'rest_framework_simplejwt',
-    'rest_framework_simplejwt.token_blacklist',
     'drf_yasg',
-    'corsheaders',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + MY_APPS + THIRD_PARTY_APPS
@@ -65,7 +61,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -130,10 +125,6 @@ CACHES = {
         },
     },
 }
-
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:5173',
-]
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/

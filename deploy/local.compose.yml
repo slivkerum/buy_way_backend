@@ -8,7 +8,7 @@ services:
     volumes:
       - bay_way_postgres_data:/var/lib/postgresql/data
     env_file:
-      - .test.env
+      - .local.env
     ports:
       - "1313:5432"
     networks:
@@ -35,8 +35,9 @@ services:
     volumes:
       - socket:/app/sockets/
       - static:/app/static
+      - ../src:/app
     env_file:
-      - .test.env
+      - .local.env
     networks:
       - backend
     depends_on:
@@ -50,7 +51,7 @@ services:
       context: ../nginx
       dockerfile: Dockerfile
     env_file:
-      - .test.env
+      - .local.env
     volumes:
       - socket:/files/socket
       - static:/files/django_staticfiles:ro
