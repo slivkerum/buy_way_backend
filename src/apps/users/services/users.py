@@ -6,7 +6,6 @@ from dataclasses import dataclass
 from uuid import UUID
 
 from apps.users.entities.users import UserEntity
-from apps.users.exceptions.users import UserIdNotFound
 from apps.users.repositories.users import BaseUserRepository
 
 

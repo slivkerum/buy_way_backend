@@ -1,9 +1,11 @@
 from dataclasses import dataclass
-from uuid import uuid4
+from typing import Optional
+from uuid import uuid4, UUID
 
 from django.db import transaction
 
-from apps.users.entities.users import UserEntity
+from apps.users.entities.organizations import OrganizationEntity
+from apps.users.entities.users import UserEntity, UserRole
 from apps.users.exceptions.users import UserEmailAlreadyExistsException
 from apps.users.services.users import BaseUserService
 from apps.users.services.organizations import BaseOrganizationService
@@ -16,17 +18,26 @@ class CreateUserUseCase:
     organization_service: BaseOrganizationService
     email_confirmation_service: SendEmailConfirmationCodeUseCase
 
-    def execute(self, user_data: dict) -> UserEntity:
+    def execute(
+            self,
+            email: str,
+            password: str,
+            phone: str,
+            first_name: str,
+            last_name: str,
+            role: UserRole,
+            organization: Optional[OrganizationEntity]
+    ) -> UserEntity:
+        print('s')
         user_entity = UserEntity(
             id=uuid4(),
-            email=user_data["email"],
-            password=user_data["password"],
-            phone=user_data.get("phone"),
-            first_name=user_data.get("first_name"),
-            last_name=user_data.get("last_name"),
-            role=user_data.get("role"),
-            is_active=user_data.get("is_active", False),
-            organization=user_data.get("organization"),
+            email=email,
+            password=password,
+            phone=phone,
+            first_name=first_name,
+            last_name=last_name,
+            role=role,
+            organization=organization,
         )
 
         try:
@@ -42,7 +53,6 @@ class CreateUserUseCase:
 
         with transaction.atomic():
             self.user_service.create_user(user_entity)
-            self.user_service.update_user(user_entity)
             self.email_confirmation_service.execute(user_entity.email)
 
         return user_entity

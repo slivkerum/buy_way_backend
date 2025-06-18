@@ -1,27 +1,35 @@
 from http import HTTPStatus
+from pickle import FALSE
+from uuid import UUID
 
 from django.http import HttpRequest
 from ninja import (
+    Query,
     Router,
 )
 from ninja.errors import HttpError
 from ninja.security import HttpBearer
 
 from api.schemas import ApiResponse
+from api.v1.users.filters import UserFilters
 from api.v1.users.schemas import (
     CredentialsRequestSchema,
     RefreshTokenRequestSchema,
     TokenResponseSchema,
+    UserRegistrationRequestSchema, UserResponseSchema, ConfirmationRequestSchema,
 )
 from apps.common.exceptions import ServiceException
 from apps.users.exceptions.users import (
     UserEmailNotFound,
     UserInvalidCredentialsException,
 )
+from apps.users.services.users import BaseUserService
 from apps.users.use_cases.auth.authenticate import AuthenticateUseCase
 from apps.users.use_cases.tokens.get import GetTokenPairUseCase
 from apps.users.use_cases.tokens.refresh import RefreshTokenUseCase
 from apps.users.use_cases.tokens.revoke import RevokeTokenUseCase
+from apps.users.use_cases.users.create import CreateUserUseCase
+from apps.users.use_cases.users.email_confirmation.confirm import ConfirmEmailCodeUseCase
 from config.containers import get_container
 
 
@@ -87,6 +95,51 @@ def revoke(
 
     try:
         use_case.execute(schema.refresh_token)
+    except ServiceException as e:
+        raise HttpError(status_code=HTTPStatus.BAD_REQUEST, message=e.message)
+
+    return ApiResponse(data=None)
+
+
+@router.post('registration/', response={HTTPStatus.CREATED: UserResponseSchema})
+def registration(
+        request: HttpRequest,
+        schema: UserRegistrationRequestSchema,
+) -> UserResponseSchema:
+    """Регистрация пользователя"""
+    container = get_container()
+    use_case: CreateUserUseCase = container.resolve(CreateUserUseCase)
+
+    try:
+        user = use_case.execute(
+            email=schema.email,
+            password=schema.password,
+            first_name=schema.first_name,
+            last_name=schema.last_name,
+            role=schema.role,
+            organization=schema.organization,
+            phone=schema.phone,
+        )
+    except ServiceException as e:
+        raise HttpError(status_code=HTTPStatus.BAD_REQUEST, message=e.message)
+
+    return UserResponseSchema.from_entity(user)
+
+
+@router.post('confirm_email/', response={HTTPStatus.OK: ApiResponse})
+def confirm_email(
+        request: HttpRequest,
+        schema: ConfirmationRequestSchema,
+) -> ApiResponse:
+    """Подтверждение почты"""
+    container = get_container()
+    use_case: ConfirmEmailCodeUseCase = container.resolve(ConfirmEmailCodeUseCase)
+
+    try:
+        use_case.execute(
+            email=schema.email,
+            code=schema.code,
+        )
     except ServiceException as e:
         raise HttpError(status_code=HTTPStatus.BAD_REQUEST, message=e.message)
 

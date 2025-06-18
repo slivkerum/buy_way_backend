@@ -52,3 +52,19 @@ class UserIncorrectRoleException(ServiceException):
     @property
     def message(self):
         return 'У вас нет прав для просмотра содержимого'
+
+
+@dataclass(eq=False)
+class CodeIstek(ServiceException):
+
+    @property
+    def message(self):
+        return 'Код истек'
+
+
+@dataclass(eq=False)
+class InvalidCode(ServiceException):
+
+    @property
+    def message(self):
+        return 'Неверный код'

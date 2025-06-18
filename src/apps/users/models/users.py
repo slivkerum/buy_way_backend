@@ -41,6 +41,7 @@ class User(AbstractUser):
     last_name = models.CharField(max_length=256, verbose_name=_('Фамилия'))
 
     email = models.EmailField(unique=True, verbose_name=_('Email'))
+    password = models.CharField(max_length=128, verbose_name=_('Пароль'))
 
     organization = models.ForeignKey(
         to='users.Organization',
@@ -90,8 +91,10 @@ class User(AbstractUser):
             last_name=user.last_name,
             phone=user.phone,
             email=user.email,
+            password=user.password,
             organization=user.organization if user.organization else None,
             role=user.role,
+            is_active=user.is_active,
         )
 
     class Meta:

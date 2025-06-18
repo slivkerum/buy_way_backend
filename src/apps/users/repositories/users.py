@@ -60,6 +60,7 @@ class UserRepository(BaseUserRepository):
 
     def create_user(self, user: UserEntity) -> UserEntity:
         user_model = User.from_entity(user)
+        user_model.set_password(user.password)
         user_model.save()
         return user_model.to_entity()
 

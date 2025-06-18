@@ -14,10 +14,39 @@ from apps.users.entities.users import (
 )
 
 
+class UserRegistrationRequestSchema(BaseModel):
+    email: str
+    password: str
+
+    phone: str
+    first_name: str
+    last_name: str
+
+    organization: Optional['OrganizationResponseSchema'] = Field(default=None)
+    role: UserRole
+
+    @classmethod
+    def to_entity(cls, user_entity: UserEntity) -> 'UserRegistrationRequestSchema':
+        return cls(
+            email=user_entity.email,
+            password=user_entity.password,
+            first_name=user_entity.first_name,
+            last_name=user_entity.last_name,
+            organization=OrganizationResponseSchema.from_entity(
+                user_entity.organization
+            ) if user_entity.organization else None,
+            role=user_entity.role,
+            phone=user_entity.phone,
+        )
+
 class CredentialsRequestSchema(BaseModel):
     email: str
     password: str
 
+
+class ConfirmationRequestSchema(BaseModel):
+    email: str
+    code: str
 
 class UserResponseSchema(BaseModel):
     id: UUID  # noqa

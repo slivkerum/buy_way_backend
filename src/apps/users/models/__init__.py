@@ -9,3 +9,4 @@ from .organizations import (
 from .email_confirmation import (
     EmailConfirmationCode
 )
+from .tokens import IssuedToken  # noqa
