@@ -1,46 +1,42 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from uuid import UUID
 
-from django.core.files.uploadedfile import UploadedFile
-
-from apps.users.entities.organizations import OrganizationEntity
+from apps.users.entities.organizations import OrganizationEntity, OrganizationDocumentsEntity
 from apps.users.repositories.organizations import BaseOrganizationRepository
 
 
 class BaseOrganizationService(ABC):
 
     @abstractmethod
-    def create_organization(self, entity: OrganizationEntity, files: list) -> OrganizationEntity: ...
-
-    @abstractmethod
-    def get_user_organizations(self, user_id: UUID) -> OrganizationEntity: ...
-
-    @abstractmethod
     def get_by_id(self, org_id: int) -> OrganizationEntity: ...
 
     @abstractmethod
-    def remove_file(self, org_id: int, file_id: int) -> None: ...
+    def update_fields(self, org_id: int, **kwargs) -> None: ...
 
     @abstractmethod
-    def add_file(self, org_id: int, file: UploadedFile) -> None: ...
+    def create_organization(self, organization: OrganizationEntity) -> OrganizationEntity:...
 
+    @abstractmethod
+    def add_documents(self, org_id: int, documents: OrganizationDocumentsEntity) -> None:...
+
+    @abstractmethod
+    def remove_documents(self, org_id: int, document_id: int) -> None:...
 
 @dataclass
 class OrganizationService(BaseOrganizationService):
     repo: BaseOrganizationRepository
 
-    def create_organization(self, entity: OrganizationEntity, files: list) -> OrganizationEntity:
-        return self.repo.create(entity, files)
-
-    def get_user_organizations(self, user_id: UUID) -> OrganizationEntity:
-        return self.repo.get_by_owner(user_id)
-
     def get_by_id(self, org_id: int) -> OrganizationEntity:
         return self.repo.get_by_id(org_id)
 
-    def remove_file(self, org_id: int, file_id: int) -> None:
-        self.repo.remove_file(org_id, file_id)
+    def update_fields(self, org_id: int, **kwargs) -> None:
+        self.repo.update_fields(org_id, **kwargs)
 
-    def add_file(self, org_id: int, file: UploadedFile) -> None:
-        self.repo.add_file(org_id, file)
+    def create_organization(self, organization: OrganizationEntity) -> OrganizationEntity:
+        return self.repo.create_organization(organization)
+
+    def add_documents(self, org_id: int, documents: OrganizationDocumentsEntity) -> None:
+        self.repo.add_document(org_id, documents)
+
+    def remove_documents(self, org_id: int, document_id: int) -> None:
+        self.repo.remove_document(org_id, document_id)

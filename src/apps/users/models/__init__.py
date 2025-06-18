@@ -2,7 +2,8 @@ from .users import (
     User
 )
 from .organizations import (
-    Organization
+    Organization,
+    OrganizationDocuments
 )
 
 from .email_confirmation import (

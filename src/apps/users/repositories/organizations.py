@@ -1,87 +1,70 @@
 import os
-
 from abc import (
     ABC,
     abstractmethod,
 )
-from uuid import UUID
 
-from django.core.files.uploadedfile import UploadedFile
 
-from apps.users.models.organizations import Organization, OrganizationDocument
-from apps.users.models.users import User
-from apps.users.entities.organizations import OrganizationEntity
+from apps.users.models.organizations import Organization, OrganizationDocuments
+from apps.users.entities.organizations import OrganizationEntity, OrganizationDocumentsEntity
 from apps.users.exceptions.organizations import (
-    OrganizationNotFound
+    OrganizationNotFoundException
 )
 
 
 class BaseOrganizationRepository(ABC):
 
     @abstractmethod
-    def create(self, entity: OrganizationEntity, files: list) -> OrganizationEntity: ...
-
-    @abstractmethod
-    def get_by_owner(self, user_id: UUID) -> OrganizationEntity: ...
-
-    @abstractmethod
     def get_by_id(self, org_id: int) -> OrganizationEntity: ...
 
     @abstractmethod
-    def remove_file(self, org_id: int, file_id: int) -> None: ...
+    def update_fields(self, org_id: int, **kwargs) -> None: ...
 
     @abstractmethod
-    def add_file(self, org_id: int, file: UploadedFile) -> None: ...
+    def create_organization(self, organization: OrganizationEntity) -> OrganizationEntity: ...
+
+    @abstractmethod
+    def add_document(self, org_id: int, document_id: OrganizationDocumentsEntity) -> None: ...
+
+    @abstractmethod
+    def remove_document(self, org_id: int, document_id: int) -> None: ...
 
 
 class OrganizationRepository(BaseOrganizationRepository):
 
-    def create(self, entity: OrganizationEntity, files: list) -> OrganizationEntity:
-        owner = User.objects.get(id=entity.owner_id)
-
-        org = Organization.objects.create(
-            name=entity.name,
-            owner=owner,
-            is_active=False
-        )
-
-        for file in files:
-            OrganizationDocument.objects.create(
-                organization=org,
-                file=file,
-            )
-
-        return org.to_entity()
-
-    def get_by_owner(self, user_id: UUID) -> OrganizationEntity:
-        org = Organization.objects.filter(owner_id=user_id).first()
-        return org.to_entity()
-
     def get_by_id(self, org_id: int) -> OrganizationEntity:
         org = Organization.objects.filter(id=org_id).first()
         if not org:
-            raise OrganizationNotFound(org_id)
+            raise OrganizationNotFoundException(org_id)
         return org.to_entity()
 
-    def remove_file(self, org_id: int, file_id: int) -> None:
+    def update_fields(self, org_id: int, **kwargs) -> None:
+        org = Organization.objects.filter(id=org_id)
+        if not org:
+            raise OrganizationNotFoundException(org_id)
+        org.update(**kwargs)
+
+    def create_organization(self, organization: OrganizationEntity) -> OrganizationEntity:
+        organization_model = Organization.from_entity(organization)
+        organization_model.save()
+        return organization_model.to_entity()
+
+    def add_document(self, org_id: int, document: OrganizationDocumentsEntity) -> None:
         org = Organization.objects.filter(id=org_id).first()
         if not org:
-            raise OrganizationNotFound(org_id)
+            raise OrganizationNotFoundException(org_id)
 
-        document = org.documents.filter(id=file_id).first()
+        document_model = OrganizationDocuments.from_entity(document, organization=org)
+        document_model.save()
+
+    def remove_document(self, org_id: int, document_id: int) -> None:
+        org = Organization.objects.filter(id=org_id).first()
+        if not org:
+            raise OrganizationNotFoundException(org_id)
+
+        document = org.documents.filter(id=document_id).first()
         if document:
-            file_path = document.file.path
+            file_path = document.path.path
             if os.path.exists(file_path):
                 os.remove(file_path)
             document.delete()
-
-    def add_file(self, org_id: int, file: UploadedFile) -> None:
-        org = Organization.objects.filter(id=org_id).first()
-
-        if not org:
-            raise OrganizationNotFound(org_id)
-
-        OrganizationDocument.objects.create(
-            organization=org,
-            file=file,
-        )

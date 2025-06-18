@@ -47,8 +47,8 @@ class OrganizationAdmin(admin.ModelAdmin):
     )
 
     readonly_fields = ("created_at",)
-    list_display = ("id", "name", "owner", "is_active", "created_at")
-    search_fields = ("name", "owner__email")
+    list_display = ("id", "name", "is_active", "created_at")
+    search_fields = ("name", "user__email")
     ordering = ("-created_at",)
     list_filter = ("is_active", "created_at")
 

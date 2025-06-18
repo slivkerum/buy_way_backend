@@ -1,12 +1,12 @@
 version: '3.8'
 
 services:
-  bay-way-postgres:
-    container_name: bay-way-postgres
+  buy-way-postgres:
+    container_name: buy-way-postgres
     image: postgres:14
     restart: always
     volumes:
-      - bay_way_postgres_data:/var/lib/postgresql/data
+      - buy_way_postgres_data:/var/lib/postgresql/data
     env_file:
       - .local.env
     ports:
@@ -14,19 +14,19 @@ services:
     networks:
       - backend
 
-  bay-way-redis:
+  buy-way-redis:
     image: redis:7
-    container_name: bay-way-redis
+    container_name: buy-way-redis
     restart: always
     volumes:
-      - bay_way_redis_data:/data
+      - buy_way_redis_data:/data
     ports:
       - "6379:6379"
     networks:
       - backend
 
-  bay-way-backend:
-    container_name: bay-way-backend
+  buy-way-backend:
+    container_name: buy-way-backend
     build:
       context: ../src
       dockerfile: Dockerfile
@@ -41,11 +41,11 @@ services:
     networks:
       - backend
     depends_on:
-      - bay-way-postgres
-      - bay-way-redis
+      - buy-way-postgres
+      - buy-way-redis
 
-  bay-way-nginx:
-    container_name: bay-way-nginx
+  buy-way-nginx:
+    container_name: buy-way-nginx
     restart: always
     build:
       context: ../nginx
@@ -60,11 +60,11 @@ services:
     networks:
       - backend
     depends_on:
-      - bay-way-backend
+      - buy-way-backend
 
 volumes:
-  bay_way_postgres_data:
-  bay_way_redis_data:
+  buy_way_postgres_data:
+  buy_way_redis_data:
   static:
   socket:
 

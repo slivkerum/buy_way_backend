@@ -2,6 +2,8 @@ from dataclasses import dataclass
 from enum import Enum
 from uuid import UUID
 
+from apps.users.entities.organizations import OrganizationEntity
+
 
 class UserRole(str, Enum):
     ADMIN = 'Администратор'
@@ -17,6 +19,8 @@ class UserEntity:
     last_name: str
 
     phone: str
+
+    organization: OrganizationEntity
 
     email: str
     password: str

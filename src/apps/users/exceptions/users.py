@@ -5,29 +5,29 @@ from apps.common.exceptions import ServiceException
 
 
 @dataclass(eq=False)
-class UserIdNotFound(ServiceException):
-    id: UUID
-
-    @property
-    def message(self):
-        return f"Пользователь с таким id: {self.id} не найден"
-
-
-@dataclass(eq=False)
 class UserEmailNotFound(ServiceException):
     email: str
 
     @property
     def message(self):
-        return f"Пользователь с таки email: {self.email} не найден"
+        return f'Пользователь с переданным email не найден: {self.email}'
 
 
 @dataclass(eq=False)
-class UserNotActiveException(ServiceException):
+class UserEmailAlreadyExistsException(ServiceException):
 
     @property
     def message(self):
-        return 'Пользователь неактивен'
+        return f'Такой email уже существует'
+
+
+@dataclass(eq=False)
+class UserIdNotFound(ServiceException):
+    user_id: UUID
+
+    @property
+    def message(self):
+        return f'Пользователь с переданным id не найден: {self.user_id}'
 
 
 @dataclass(eq=False)
@@ -39,9 +39,16 @@ class UserInvalidCredentialsException(ServiceException):
 
 
 @dataclass(eq=False)
-class UserEmailAlreadyExistsException(ServiceException):
+class UserNotActiveException(ServiceException):
 
     @property
     def message(self):
-        return f'Пользователь с таким email уже существует'
+        return 'Пользователь неактивен'
 
+
+@dataclass(eq=False)
+class UserIncorrectRoleException(ServiceException):
+
+    @property
+    def message(self):
+        return 'У вас нет прав для просмотра содержимого'

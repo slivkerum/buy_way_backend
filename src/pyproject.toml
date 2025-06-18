@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "bay-way"
+name = "buy-way"
 version = "1.0.0"
 description = ""
 authors = ["Dmitriy <https://github.com/slivkerum>"]

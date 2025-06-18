@@ -5,8 +5,9 @@ from abc import (
 from uuid import UUID
 
 from django.contrib.auth.hashers import check_password
-from django.utils import timezone
+from django.db.models import Q
 
+from apps.users.filters.users import UserFilters
 from apps.users.models.users import User
 from apps.users.entities.users import (
     UserEntity,
@@ -26,58 +27,51 @@ class BaseUserRepository(ABC):
     def get_user_by_email(self, email: str) -> UserEntity:...
 
     @abstractmethod
-    def compare_password(self, given_password: str, user_password: str) -> bool:...
+    def compare_passwords(self, given_password: str, user_password: str) -> bool:...
 
     @abstractmethod
     def update_user(self, user: UserEntity) -> UserEntity:
         ...
 
     @abstractmethod
-    def create_user(self, user: UserEntity) -> None:...
-
-    @abstractmethod
-    def soft_delete_user(self, user: UserEntity) -> None:...
+    def create_user(self, user: UserEntity) -> UserEntity: ...
 
 
 class UserRepository(BaseUserRepository):
 
     def get_user_by_id(self, user_id: UUID) -> UserEntity:
-        user = User.objects.filter(id=user_id, is_deleted=False)
+        user = User.objects.filter(id=user_id)
         if not user:
             raise UserIdNotFound(user_id)
         return user.first().to_entity()
 
     def get_user_by_email(self, email: str) -> UserEntity:
-        user = User.objects.filter(email=email, is_deleted=False)
+        user = User.objects.filter(email=email)
         if not user:
             raise UserEmailNotFound(email)
         return user.first().to_entity()
 
-    def compare_password(self, given_password: str, user_password: str) -> bool:
+    def compare_passwords(self, given_password: str, user_password: str) -> bool:
         return check_password(given_password, user_password)
 
     def update_user(self, user: UserEntity) -> UserEntity:
         User.objects.filter(id=user.id).update(enters_count=user.enters_count)
         return self.get_user_by_id(user.id)
 
-    def create_user(self, user: UserEntity) -> None:
-        User.objects.create_user(
-            id=user.id,
-            first_name=user.first_name,
-            last_name=user.last_name,
-            phone=user.phone,
-
-            email=user.email,
-            password=user.password,
-            role=user.role,
-        )
-
-    def soft_delete_user(self, user: UserEntity) -> None:
-        user = User.objects.filter(id=user.id).first()
-        if user:
-            user.is_deleted = True
-            user.deleted_at = timezone.now()
-            user.is_active = False
-            user.save()
+    def create_user(self, user: UserEntity) -> UserEntity:
+        user_model = User.from_entity(user)
+        user_model.save()
+        return user_model.to_entity()
 
 
+    @staticmethod
+    def _build_user_query(filters: UserFilters) -> Q:
+        query = Q()
+
+        if filters.is_active:
+            query &= Q(is_active=True)
+
+        if filters.role:
+            query &= Q(role=filters.role)
+
+        return query

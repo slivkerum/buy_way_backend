@@ -4,16 +4,18 @@ from apps.common.exceptions import ServiceException
 
 
 @dataclass(eq=False)
-class OrganizationNotFound(ServiceException):
-    id: int
+class DocumentNotFoundException(ServiceException):
+    document_id: int
 
     @property
     def message(self):
-        return f"Организация с ID {id} не найдена"
+        return f'Школа с id {self.document_id} не найдена'
+
 
 @dataclass(eq=False)
-class InvalidAddFile(ServiceException):
+class OrganizationNotFoundException(ServiceException):
+    organization_name: int
 
     @property
     def message(self):
-        return f"Ошибка добавления файла, попробуйте снова"
+        return f'Данной организации {self.organization_name} не существует'

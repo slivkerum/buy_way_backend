@@ -1,12 +1,9 @@
-from django.urls import path, include
+from ninja import Router
 
-urlpatterns = [
-    path('products/reviews/', include('api.v1.views.reviews.urls')),
-    path('products/', include('api.v1.views.products.urls')),
-    path('users/', include('api.v1.views.users.urls')),
-    path('auth/', include('api.v1.views.auth.urls')),
-    path('categories/', include('api.v1.views.categories.urls')),
-    path('characteristics/', include('api.v1.views.characteristics.urls')),
-    path('cart/', include('api.v1.views.cart.urls')),
-    path('', include('api.v1.views.token.urls')),
-]
+from api.v1.users.handlers import router as users_router
+from api.v1.organizations.handlers import router as organizations_router
+
+
+router = Router(tags=["v1"])
+router.add_router('users/', users_router)
+router.add_router('organizations/', organizations_router)

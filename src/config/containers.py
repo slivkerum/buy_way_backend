@@ -2,45 +2,9 @@ from functools import lru_cache
 
 import punq
 
-from apps.products.repositories.cart import (
-    BaseCartRepository,
-    CartRepository,
-)
-from apps.products.repositories.categories import (
-    BaseCategoryRepository,
-    CategoryRepository,
-)
-from apps.products.repositories.characteristics import (
-    BaseCharacteristicRepository,
-    CharacteristicRepository,
-)
-from apps.products.repositories.products import (
-    BaseProductRepository,
-    ProductRepository,
-)
-from apps.products.repositories.reviews import (
-    BaseReviewRepository,
-    ReviewRepository,
-)
-from apps.products.services.cart import (
-    BaseCartService,
-    CartService,
-)
-from apps.products.services.categories import (
-    BaseCategoryService,
-    CategoryService,
-)
-from apps.products.services.characteristics import (
-    BaseCharacteristicService,
-    CharacteristicService,
-)
-from apps.products.services.products import (
-    BaseProductService,
-    ProductService,
-)
-from apps.products.services.reviews import (
-    BaseReviewService,
-    ReviewService,
+from apps.common.cache import (
+    BaseCacheClient,
+    RedisCacheClient,
 )
 from apps.users.repositories.organizations import (
     BaseOrganizationRepository,
@@ -64,12 +28,32 @@ from apps.users.use_cases.users.email_confirmation.send import (
 from apps.users.use_cases.users.email_confirmation.confirm import (
     ConfirmEmailCodeUseCase
 )
-from apps.users.use_cases.users.auth.registration import (
-    RegisterUserUseCase,
+from apps.users.use_cases.users.email_confirmation.send import (
+    SendEmailConfirmationCodeUseCase,
 )
-from apps.users.use_cases.users.cart.create import (
-    CreateCartUseCases
+from apps.users.use_cases.users.create import (
+    CreateUserUseCase
 )
+from apps.users.repositories.tokens import (
+    BaseTokenRepository,
+    TokenRepository,
+)
+from apps.users.services.tokens import (
+    BaseTokenizerService,
+    BaseTokenService,
+    BaseTokenValidatorService,
+    ComposedTokenValidatorService,
+    TokenExpiryValidatorService,
+    TokenizerService,
+    TokenRevokedValidatorService,
+    TokenService,
+    TokenTypeValidatorService,
+)
+from apps.users.use_cases.auth.authenticate import AuthenticateUseCase
+from apps.users.use_cases.tokens.get import GetTokenPairUseCase
+from apps.users.use_cases.tokens.refresh import RefreshTokenUseCase
+from apps.users.use_cases.tokens.revoke import RevokeTokenUseCase
+
 
 
 @lru_cache(1)
@@ -81,23 +65,40 @@ def _initialize_container() -> punq.Container:
     container = punq.Container()
 
     container.register(BaseUserRepository, UserRepository)
-    container.register(BaseProductRepository, ProductRepository)
-    container.register(BaseCategoryRepository, CategoryRepository)
-    container.register(BaseCharacteristicRepository, CharacteristicRepository)
-    container.register(BaseReviewRepository, ReviewRepository)
-    container.register(BaseOrganizationRepository, OrganizationRepository)
-    container.register(BaseCartRepository, CartRepository)
+    container.register(BaseTokenRepository, TokenRepository)
 
     container.register(BaseUserService, UserService)
-    container.register(BaseProductService, ProductService)
-    container.register(BaseCategoryService, CategoryService)
-    container.register(BaseCharacteristicService, CharacteristicService)
-    container.register(BaseReviewService, ReviewService)
-    container.register(BaseOrganizationService, OrganizationService)
-    container.register(BaseCartService, CartService)
+    container.register(BaseTokenService, TokenService)
+    container.register(BaseTokenizerService, TokenizerService)
 
-    container.register(CreateCartUseCases)
-    container.register(RegisterUserUseCase)
+    container.register(TokenTypeValidatorService)
+    container.register(TokenExpiryValidatorService)
+    container.register(TokenRevokedValidatorService)
+
+    def build_token_validators() -> BaseTokenValidatorService:
+        return ComposedTokenValidatorService(
+            validators=[
+                container.resolve(TokenTypeValidatorService),
+                container.resolve(TokenExpiryValidatorService),
+                container.resolve(TokenRevokedValidatorService),
+            ],
+        )
+
+    container.register(BaseTokenValidatorService, factory=build_token_validators)
+
+    container.register(AuthenticateUseCase)
+    container.register(GetTokenPairUseCase)
+    container.register(RefreshTokenUseCase)
+    container.register(RevokeTokenUseCase)
+
+    container.register(SendEmailConfirmationCodeUseCase)
+    container.register(ConfirmEmailCodeUseCase)
+    container.register(CreateUserUseCase)
+
+    container.register(BaseOrganizationRepository, OrganizationRepository)
+
+    container.register(BaseUserService, UserService)
+    container.register(BaseOrganizationService, OrganizationService)
     container.register(SendEmailConfirmationCodeUseCase)
     container.register(ConfirmEmailCodeUseCase)
 

@@ -7,7 +7,11 @@ from apps.users.models import User
 
 
 class EmailConfirmationCode(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="confirmation_codes")
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="confirmation_codes"
+    )
     code = models.CharField(max_length=6)
     created_at = models.DateTimeField(auto_now_add=True)
     expires_at = models.DateTimeField()
