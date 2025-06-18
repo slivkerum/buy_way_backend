@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 import os
 from datetime import timedelta
 from pathlib import Path
+from drf_yasg import openapi
 
 import environ
 
@@ -181,6 +182,19 @@ DJOSER = {
     'TOKEN_MODEL': None,
     'ACTIVATION_URL': env('ACTIVATION_URL'),
     'PASSWORD_RESET_CONFIRM_URL': env('PASSWORD_RESET_CONFIRM_URL'),
+}
+
+#Swagger
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'Bearer': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header',
+            'description': 'JWT токен. Пример: **Bearer &lt;ваш токен&gt;**',
+        }
+    },
+    'USE_SESSION_AUTH': False,
 }
 
 # EMAIL

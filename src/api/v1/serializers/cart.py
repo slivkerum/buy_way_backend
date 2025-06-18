@@ -32,7 +32,10 @@ class CartSerializer(serializers.Serializer):
             id=self.validated_data.get("id"),
             user_id=self.validated_data["user_id"],
             total_price=self.validated_data.get("total_price"),
-            items=[CartProductEntity(**product) for product in self.validated_data.get("items", [])],
+            items=[
+                CartProductEntity(**item)
+                for item in self.validated_data.get("products", [])
+            ],
             created_at=self.validated_data.get("created_at")
         )
 
@@ -42,5 +45,8 @@ class CartSerializer(serializers.Serializer):
             "id": cart.id,
             "user_id": cart.user_id,
             "total_price": cart.total_price,
-            "items": [CartProductSerializer.from_entity(product) for product in cart.items]
+            "products": [
+                CartProductSerializer.from_entity(product)
+                for product in cart.items
+            ]
         }

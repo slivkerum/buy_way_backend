@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from uuid import UUID
 from dataclasses import dataclass
 
+from apps.products.exceptions.cart import CartNotFound
 from apps.products.models import Cart, CartProduct, Product
 from apps.products.entities.cart import CartProductEntity, CartEntity
 
@@ -52,7 +53,9 @@ class BaseCartRepository(ABC):
 class CartRepository(BaseCartRepository):
 
     def get_by_user(self, user_id: UUID) -> CartEntity:
-        cart = Cart.objects.get(user_id=user_id)
+        cart = Cart.objects.filter(user_id=user_id).first()
+        if not cart:
+            raise CartNotFound
         return cart.to_entity()
 
     def create(self, user_id: UUID) -> CartEntity:
@@ -60,7 +63,7 @@ class CartRepository(BaseCartRepository):
         return cart.to_entity()
 
     def add_product(self, cart_id: int, product_id: UUID, quantity: int) -> CartProductEntity:
-        cart = Cart.objects.get(id=cart_id)
+        cart = Cart.objects.filter(id=cart_id).first()
 
         cart_product, created = CartProduct.objects.get_or_create(
             cart=cart,
@@ -76,7 +79,7 @@ class CartRepository(BaseCartRepository):
         return cart_product.to_entity()
 
     def update_product_quantity(self, cart_id: int, product_id: UUID, quantity: int) -> CartProductEntity:
-        cart_product = CartProduct.objects.get(cart_id=cart_id, product_id=product_id)
+        cart_product = CartProduct.objects.filter(cart_id=cart_id, product_id=product_id).first()
         cart_product.quantity = quantity
         cart_product.save()
         self._recalculate_cart_total(cart_product.cart)
@@ -84,7 +87,7 @@ class CartRepository(BaseCartRepository):
         return cart_product.to_entity()
 
     def remove_product(self, cart_id: int, product_id: UUID) -> None:
-        cart_product = CartProduct.objects.get(cart_id=cart_id, product_id=product_id)
+        cart_product = CartProduct.objects.filter(cart_id=cart_id, product_id=product_id).first()
         cart = cart_product.cart
         cart_product.delete()
         self._recalculate_cart_total(cart)
@@ -94,7 +97,7 @@ class CartRepository(BaseCartRepository):
         return [product.to_entity() for product in cart_products]
 
     def clear_cart(self, cart_id: int) -> None:
-        cart = Cart.objects.get(id=cart_id)
+        cart = Cart.objects.filter(id=cart_id).first()
         CartProduct.objects.filter(cart=cart).delete()
         cart.total_price = 0
         cart.save(update_fields=["total_price"])

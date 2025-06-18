@@ -2,6 +2,9 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, permissions
 
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+
 from config.containers import get_container
 
 from apps.products.services.cart import BaseCartService
@@ -12,8 +15,11 @@ from api.v1.serializers.cart import CartSerializer, CartProductSerializer
 class CartView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
-    @staticmethod
-    def get(request):
+    @swagger_auto_schema(
+        operation_description="Получение корзины текущего пользователя",
+        responses={200: CartSerializer}
+    )
+    def get(self, request):
         user_id = request.user.id
         container = get_container()
         service: BaseCartService = container.resolve(BaseCartService)
@@ -25,8 +31,23 @@ class CartView(APIView):
         serialized = CartSerializer.from_entity(cart)
         return Response(serialized)
 
-    @staticmethod
-    def post(request):
+    @swagger_auto_schema(
+        request_body=CartSerializer,
+        operation_description="Создание корзины для текущего пользователя",
+        responses={201: CartSerializer},
+        examples=[
+            {
+                "products": [
+                    {
+                        "product_id": "a1e8d0c6-8a7e-4ec4-a8e6-1846f33f6d92",
+                        "quantity": 2
+                    }
+                ],
+                "total_price": "1999.99"
+            }
+        ]
+    )
+    def post(self, request):
         serializer = CartSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -42,7 +63,13 @@ class CartView(APIView):
 
 class CartProductView(APIView):
     permission_classes = [permissions.IsAuthenticated]
+    serializer_class: CartProductSerializer = CartProductSerializer
 
+    @swagger_auto_schema(
+        request_body=CartProductSerializer,
+        operation_description="Добавление товара в корзину",
+        responses={201: CartProductSerializer}
+    )
     def post(self, request):
         container = get_container()
         cart_service: BaseCartService = container.resolve(BaseCartService)
@@ -55,6 +82,11 @@ class CartProductView(APIView):
         serialized = CartProductSerializer.from_entity(cart_product)
         return Response(serialized, status=status.HTTP_201_CREATED)
 
+    @swagger_auto_schema(
+        request_body=CartProductSerializer,
+        operation_description="Обновление количества товара в корзине",
+        responses={200: CartProductSerializer}
+    )
     def put(self, request):
         container = get_container()
         service: BaseCartService = container.resolve(BaseCartService)
@@ -67,7 +99,18 @@ class CartProductView(APIView):
         serialized = CartProductSerializer.from_entity(cart_product)
         return Response(serialized)
 
-
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=["product_id"],
+            properties={
+                "product_id": openapi.Schema(type=openapi.TYPE_STRING, format="uuid")
+            },
+            example={"product_id": "a1e8d0c6-8a7e-4ec4-a8e6-1846f33f6d92"}
+        ),
+        operation_description="Удаление товара из корзины",
+        responses={204: "No Content"}
+    )
     def delete(self, request):
         cart_id = self.get_cart_id(request)
         product_id = request.data.get("product_id")
