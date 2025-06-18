@@ -1,9 +1,6 @@
 import os
-
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from django.conf import settings
-
 from apps.common.models import BaseDateTimeModel
 from apps.users.entities.organizations import (
     OrganizationEntity,
@@ -12,13 +9,12 @@ from apps.users.entities.organizations import (
 
 
 def organization_documents_upload_path(instance, filename):
-    return f"organizations/{instance.organization.name}/{filename}"
+    return f"organizations/{instance.organization_id}/{filename}"
 
 
 class Organization(BaseDateTimeModel):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255, verbose_name=_("Название организации"))
-
     is_active = models.BooleanField(default=False, verbose_name=_("Активна"))
 
     def to_entity(self) -> OrganizationEntity:
@@ -39,7 +35,7 @@ class Organization(BaseDateTimeModel):
         )
 
     def __str__(self):
-        return f"{self.name})"
+        return self.name
 
     class Meta:
         verbose_name = _("Организация")
@@ -54,14 +50,13 @@ class OrganizationDocuments(BaseDateTimeModel):
         related_name="documents",
         verbose_name=_("Организация"),
     )
-
     path = models.FileField(upload_to=organization_documents_upload_path)
 
     def to_entity(self) -> OrganizationDocumentsEntity:
         return OrganizationDocumentsEntity(
             id=self.id,
             name=self.name,
-            path=self.path.path,
+            path=self.path.url
         )
 
     @classmethod
@@ -73,7 +68,7 @@ class OrganizationDocuments(BaseDateTimeModel):
         )
 
     def __str__(self):
-        return f'{self.name}(path: {self.path})'
+        return f'{self.name} (path: {self.path})'
 
     class Meta:
         verbose_name = _("Документ")

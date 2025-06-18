@@ -19,10 +19,12 @@ from api.v1.users.schemas import (
     UserRegistrationRequestSchema, UserResponseSchema, ConfirmationRequestSchema,
 )
 from apps.common.exceptions import ServiceException
+from apps.users.entities.users import UserEntity
 from apps.users.exceptions.users import (
     UserEmailNotFound,
     UserInvalidCredentialsException,
 )
+from apps.users.models import User
 from apps.users.services.users import BaseUserService
 from apps.users.use_cases.auth.authenticate import AuthenticateUseCase
 from apps.users.use_cases.tokens.get import GetTokenPairUseCase
@@ -144,3 +146,17 @@ def confirm_email(
         raise HttpError(status_code=HTTPStatus.BAD_REQUEST, message=e.message)
 
     return ApiResponse(data=None)
+
+
+@router.get('', response={HTTPStatus.OK: UserResponseSchema}, auth=AuthBearer())
+def get_user_by_email(request: HttpRequest) -> UserResponseSchema:
+    """Получить текущего авторизованного пользователя"""
+    container = get_container()
+    user_service: BaseUserService = container.resolve(BaseUserService)
+
+    try:
+        user_entity = user_service.get_user_by_id(request.user.id)
+    except ServiceException as e:
+        raise HttpError(status_code=HTTPStatus.BAD_REQUEST, message=e.message)
+
+    return UserResponseSchema.from_entity(user_entity)

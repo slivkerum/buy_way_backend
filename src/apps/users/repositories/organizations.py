@@ -1,15 +1,9 @@
 import os
-from abc import (
-    ABC,
-    abstractmethod,
-)
-
+from abc import ABC, abstractmethod
 
 from apps.users.models.organizations import Organization, OrganizationDocuments
 from apps.users.entities.organizations import OrganizationEntity, OrganizationDocumentsEntity
-from apps.users.exceptions.organizations import (
-    OrganizationNotFoundException
-)
+from apps.users.exceptions.organizations import OrganizationNotFoundException
 
 
 class BaseOrganizationRepository(ABC):
@@ -24,7 +18,7 @@ class BaseOrganizationRepository(ABC):
     def create_organization(self, organization: OrganizationEntity) -> OrganizationEntity: ...
 
     @abstractmethod
-    def add_document(self, org_id: int, document_id: OrganizationDocumentsEntity) -> None: ...
+    def add_document(self, org_id: int, document: OrganizationDocumentsEntity) -> None: ...
 
     @abstractmethod
     def remove_document(self, org_id: int, document_id: int) -> None: ...
@@ -39,10 +33,9 @@ class OrganizationRepository(BaseOrganizationRepository):
         return org.to_entity()
 
     def update_fields(self, org_id: int, **kwargs) -> None:
-        org = Organization.objects.filter(id=org_id)
-        if not org:
+        updated_count = Organization.objects.filter(id=org_id).update(**kwargs)
+        if updated_count == 0:
             raise OrganizationNotFoundException(org_id)
-        org.update(**kwargs)
 
     def create_organization(self, organization: OrganizationEntity) -> OrganizationEntity:
         organization_model = Organization.from_entity(organization)
