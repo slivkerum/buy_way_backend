@@ -84,3 +84,25 @@ def add_documents(
         raise HttpError(status_code=HTTPStatus.BAD_REQUEST, message=e.message)
 
     return ApiResponse(data=None)
+
+
+@router.delete('delete_document/{document_id}/', response={HTTPStatus.OK: ApiResponse}, auth=AuthBearer())
+def delete_document(
+    request: HttpRequest,
+    document_id: int,
+):
+    container = get_container()
+    organization_service: BaseOrganizationService = container.resolve(BaseOrganizationService)
+
+    user = request.user
+    if not user.organization:
+        raise HttpError(HTTPStatus.BAD_REQUEST, "У пользователя нет организации")
+
+    org_id = user.organization.id
+
+    try:
+        organization_service.remove_documents(org_id=org_id, document_id=document_id)
+    except ServiceException as e:
+        raise HttpError(status_code=HTTPStatus.BAD_REQUEST, message=e.message)
+
+    return ApiResponse(data=None)
