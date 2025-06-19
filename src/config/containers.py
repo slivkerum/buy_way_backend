@@ -22,9 +22,7 @@ from apps.users.services.users import (
     BaseUserService,
     UserService,
 )
-from apps.users.use_cases.users.email_confirmation.send import (
-    SendEmailConfirmationCodeUseCase
-)
+from apps.users.use_cases.users.cart.create import CreateCartUseCases
 from apps.users.use_cases.users.email_confirmation.confirm import (
     ConfirmEmailCodeUseCase
 )
@@ -48,6 +46,46 @@ from apps.users.services.tokens import (
     TokenRevokedValidatorService,
     TokenService,
     TokenTypeValidatorService,
+)
+from apps.products.services.products import (
+    BaseProductService,
+    ProductService,
+)
+from apps.products.services.characteristics import (
+    BaseCharacteristicService,
+    CharacteristicService,
+)
+from apps.products.services.categories import (
+    BaseCategoryService,
+    CategoryService,
+)
+from apps.products.repositories.products import (
+    BaseProductRepository,
+    ProductRepository,
+)
+from apps.products.repositories.characteristics import (
+    BaseCharacteristicRepository,
+    CharacteristicRepository,
+)
+from apps.products.repositories.categories import (
+    BaseCategoryRepository,
+    CategoryRepository,
+)
+from apps.products.repositories.cart import (
+    BaseCartRepository,
+    CartRepository,
+)
+from apps.products.services.cart import (
+    BaseCartService,
+    CartService,
+)
+from apps.products.services.reviews import (
+    BaseReviewService,
+    ReviewService,
+)
+from apps.products.repositories.reviews import (
+    BaseReviewRepository,
+    ReviewRepository,
 )
 from apps.users.use_cases.auth.authenticate import AuthenticateUseCase
 from apps.users.use_cases.tokens.get import GetTokenPairUseCase
@@ -94,6 +132,7 @@ def _initialize_container() -> punq.Container:
     container.register(SendEmailConfirmationCodeUseCase)
     container.register(ConfirmEmailCodeUseCase)
     container.register(CreateUserUseCase)
+    container.register(CreateCartUseCases)
 
     container.register(BaseOrganizationRepository, OrganizationRepository)
 
@@ -101,6 +140,19 @@ def _initialize_container() -> punq.Container:
     container.register(BaseOrganizationService, OrganizationService)
     container.register(SendEmailConfirmationCodeUseCase)
     container.register(ConfirmEmailCodeUseCase)
+
+    container.register(BaseProductService, ProductService)
+    container.register(BaseProductRepository, ProductRepository)
+
+    container.register(BaseCharacteristicService, CharacteristicService)
+    container.register(BaseCategoryService, CategoryService)
+    container.register(BaseCategoryRepository, CategoryRepository)
+    container.register(BaseCharacteristicRepository, CharacteristicRepository)
+
+    container.register(BaseReviewService, ReviewService)
+    container.register(BaseReviewRepository, ReviewRepository)
+    container.register(BaseCartService, CartService)
+    container.register(BaseCartRepository, CartRepository)
 
     return container
 

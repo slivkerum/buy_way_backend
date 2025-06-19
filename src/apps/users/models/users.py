@@ -87,6 +87,7 @@ class User(AbstractUser):
     @classmethod
     def from_entity(cls, user: UserEntity):
         return cls(
+            id=user.id,
             first_name=user.first_name,
             last_name=user.last_name,
             phone=user.phone,

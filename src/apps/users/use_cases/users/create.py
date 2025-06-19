@@ -10,6 +10,7 @@ from apps.users.exceptions.users import UserEmailAlreadyExistsException
 from apps.users.services.users import BaseUserService
 from apps.users.services.organizations import BaseOrganizationService
 from apps.users.use_cases.users.email_confirmation.send import SendEmailConfirmationCodeUseCase
+from apps.users.use_cases.users.cart.create import CreateCartUseCases
 
 
 @dataclass
@@ -17,6 +18,7 @@ class CreateUserUseCase:
     user_service: BaseUserService
     organization_service: BaseOrganizationService
     email_confirmation_service: SendEmailConfirmationCodeUseCase
+    cart_use_case: CreateCartUseCases
 
     def execute(
             self,
@@ -28,7 +30,6 @@ class CreateUserUseCase:
             role: UserRole,
             organization: Optional[OrganizationEntity]
     ) -> UserEntity:
-        print('s')
         user_entity = UserEntity(
             id=uuid4(),
             email=email,
@@ -53,6 +54,9 @@ class CreateUserUseCase:
 
         with transaction.atomic():
             self.user_service.create_user(user_entity)
+
+            user = self.user_service.get_user_by_email(user_entity.email)
+            self.cart_use_case.create(user.id)
             self.email_confirmation_service.execute(user_entity.email)
 
         return user_entity
